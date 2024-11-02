@@ -1,19 +1,33 @@
-export type TipoLanche ={
-    id: number;
+// types.ts
+
+// Tipo para a tabela TB_MECHAI_CLIENTE
+export type Cliente = {
+    idCliente: number;
+    cpf: string;
     nome: string;
-    preco:number;
-    desc:string;
-}
-
-export type TipoProva = {
-    id: number;
-    name: string;
-    tipo: string;
-    materia: string;
-    title: string;
-    date: string;
-    feedback: string;
-    note: number;
-    semestre: string;
-}
-
+    endereco: string;
+    email: string;
+    telefone: string;
+    loginCliente: string;
+  };
+  
+  // Tipo para a tabela TB_MECHAI_MECANICO
+  export type Mecanico = {
+    idMecanico: number;
+    cpf: string;
+    nome: string;
+    nmEmpresa: string;
+    endereco: string;
+    telefone: string;
+    email: string;
+  };
+  
+  // Tipo para a tabela TB_MECHAI_USUARIO
+  export type Usuario = {
+    idUsuario: number;
+    idCliente: number;
+    login: string;
+    senhaHash: string;
+    tipoUsuario: string;
+  };
+  
