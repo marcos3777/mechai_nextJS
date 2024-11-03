@@ -31,3 +31,14 @@ export type Cliente = {
     tipoUsuario: string;
   };
   
+  export type Carro = {
+    idCarro: number;
+    idCliente: number;
+    placa: string;
+    marca: string;
+    modelo: string;
+    anoFabricacao: string;
+    cor: string;
+    status: number;
+    imageUrl?: string;
+  };
