@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
@@ -15,12 +15,16 @@ const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLaye
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 
 export default function InicioCliente() {
-  const [nome, setNome] = useState('');
+  const [client, setClient] = useState<any>(null);
   const [modeloVeiculo, setModeloVeiculo] = useState<string[]>([]);
   const [problema, setProblema] = useState('');
   const [descricao, setDescricao] = useState('');
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const [endereco, setEndereco] = useState('');
+  const [tipoProblema, setTipoProblema] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const problemasComuns = [
     "Falha na bateria",
@@ -32,10 +36,29 @@ export default function InicioCliente() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setNome("João da Silva");
+      const clientData = localStorage.getItem('clientData');
+      if (clientData) {
+        setClient(JSON.parse(clientData));
+      } else {
+        window.location.href = '/';
+      }
       setModeloVeiculo(["Modelo A", "Modelo B", "Modelo C"]);
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const reverseGeocode = async (lat: number, lon: number) => {
@@ -69,22 +92,56 @@ export default function InicioCliente() {
     return null;
   };
 
+  const handleSubmit = async () => {
+    try {
+      const requestData = {
+        idCliente: client.idCliente,
+        idCarro: 1,
+        tipoProblema: tipoProblema,
+        descricaoProblema: descricao,
+        enderecoAtual: endereco,
+        status: 1,
+      };
+
+      const response = await fetch('http://localhost:8080/api/orcamentos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        alert('Solicitação enviada com sucesso!');
+      } else {
+        const errorData = await response.json();
+        alert(`Erro ao enviar solicitação: ${errorData.message || 'Tente novamente mais tarde.'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar solicitação:', error);
+      alert('Erro ao conectar-se ao servidor. Por favor, tente novamente mais tarde.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <header className="flex items-center justify-between bg-black text-white p-6 rounded-lg mb-8 shadow-lg">
         <h1 className="text-2xl font-bold">Minhas Solicitações</h1>
         <div className="flex items-center space-x-4">
-          <Link href="####" className="text-lg">Minhas Solicitações</Link>
-          <div className="relative group">
+          <Link href="#" className="text-lg">Minhas Solicitações</Link>
+          <div className="relative" ref={menuRef}>
             <img
               src="/path/to/profile.jpg"
               alt="Perfil"
               className="w-10 h-10 rounded-full cursor-pointer border border-white"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             />
-            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg hidden group-hover:block">
-              <Link href="/meus-veiculos" className="block px-4 py-2 text-gray-700 hover:bg-gray-200">Meus veículos</Link>
-              <Link href="/cadastrar-veiculo" className="block px-4 py-2 text-gray-700 hover:bg-gray-200">Cadastrar veículo</Link>
-            </div>
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg">
+                <Link href="/meus-veiculos" className="block px-4 py-2 text-gray-700 hover:bg-gray-200">Meus veículos</Link>
+                <Link href="/cadastrar-veiculo" className="block px-4 py-2 text-gray-700 hover:bg-gray-200">Cadastrar veículo</Link>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -92,12 +149,13 @@ export default function InicioCliente() {
       <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6 text-gray-800">Solicitar Assistência</h2>
-          
+
           <div className="mb-6">
             <label className="block text-gray-600 font-semibold mb-2">Nome</label>
-            <p className="bg-gray-100 p-3 rounded-lg border">{nome}</p>
+            <p className="bg-gray-100 p-3 rounded-lg border">{client?.nome}</p>
           </div>
 
+          {/* Comentário: Precisamos criar o CRUD para obter os modelos de veículos do cliente */}
           <div className="mb-6">
             <label className="block text-gray-600 font-semibold mb-2">Modelo do Veículo</label>
             <select className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -110,7 +168,11 @@ export default function InicioCliente() {
 
           <div className="mb-6">
             <label className="block text-gray-600 font-semibold mb-2">Tipo de Problema</label>
-            <select className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+              className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={tipoProblema}
+              onChange={(e) => setTipoProblema(e.target.value)}
+            >
               <option value="">Selecione um problema</option>
               {problemasComuns.map((problema, index) => (
                 <option key={index} value={problema}>{problema}</option>
@@ -124,10 +186,15 @@ export default function InicioCliente() {
               className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={4}
               placeholder="Descreva o problema aqui..."
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
             />
           </div>
 
-          <button className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+          <button
+            onClick={handleSubmit}
+            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          >
             Enviar Solicitação
           </button>
         </div>
@@ -142,11 +209,11 @@ export default function InicioCliente() {
             placeholder="Digite um endereço"
             className="w-full p-3 mb-6 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <div className="h-80 rounded-lg overflow-hidden"> {/* Aumentando a altura do mapa */}
+          <div className="h-80 rounded-lg overflow-hidden">
             <MapContainer center={[-23.55052, -46.633308]} zoom={13} className="w-full h-full">
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution='&copy; OpenStreetMap contributors'
               />
               {position && <Marker position={position} />}
               <MapClickHandler />
