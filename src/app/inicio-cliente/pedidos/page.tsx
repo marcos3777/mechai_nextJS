@@ -1,15 +1,12 @@
-// pages/inicio-cliente/pedidos.tsx
-
 "use client";
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Orcamento, Cliente } from '@/types/types'; 
+import { Orcamento } from '@/types/types'; 
 import Link from 'next/link';
 
 export default function Pedidos() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
-  const [client, setClient] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,13 +14,14 @@ export default function Pedidos() {
       try {
         const clientData = localStorage.getItem('clientData');
         if (clientData) {
-          const clientParsed: Cliente = JSON.parse(clientData);
-          setClient(clientParsed);
-
+          const clientParsed = JSON.parse(clientData);
           console.log('ID do Cliente:', clientParsed.idCliente);
 
-          const response = await axios.get(
-            `http://localhost:8080/api/orcamentos/cliente/${clientParsed.idCliente}`
+          // Utilize variáveis de ambiente para a URL da API
+          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+
+          const response = await axios.get<Orcamento[]>(
+            `${API_BASE_URL}/api/orcamentos/cliente/${clientParsed.idCliente}`
           );
 
           if (response.status === 200) {
@@ -33,10 +31,12 @@ export default function Pedidos() {
             console.error('Erro ao obter os orçamentos do cliente.');
           }
         } else {
+          // Redireciona para a página inicial se não houver dados do cliente
           window.location.href = '/';
         }
       } catch (error) {
         console.error('Erro na requisição:', error);
+        // Opcional: Você pode definir um estado de erro para exibir uma mensagem para o usuário
       } finally {
         setLoading(false);
       }
@@ -75,7 +75,10 @@ export default function Pedidos() {
 
       <main>
         {loading ? (
-          <p>Carregando...</p>
+          <div className="flex justify-center items-center">
+            {/* Você pode substituir por um spinner ou indicador de carregamento mais sofisticado */}
+            <p>Carregando...</p>
+          </div>
         ) : (
           <>
             {orcamentos && orcamentos.length > 0 ? (
