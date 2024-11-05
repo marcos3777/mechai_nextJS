@@ -9,7 +9,7 @@ import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import L from 'leaflet';
 import { useMapEvent } from 'react-leaflet';
-import { Carro } from '@/types/types'; 
+import { Carro, Cliente } from '@/types/types'; // Importando Cliente
 
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
@@ -23,10 +23,9 @@ const Marker = dynamic(() => import('react-leaflet').then((mod) => mod.Marker), 
 });
 
 export default function InicioCliente() {
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<Cliente | null>(null); // Usando o tipo Cliente
   const [modeloVeiculo, setModeloVeiculo] = useState<Carro[]>([]);
   const [selectedVeiculoId, setSelectedVeiculoId] = useState<number | null>(null);
-  const [problema, setProblema] = useState('');
   const [descricao, setDescricao] = useState('');
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const [endereco, setEndereco] = useState('');
@@ -49,23 +48,28 @@ export default function InicioCliente() {
       console.log('clientData:', clientData); // Log do clientData obtido do localStorage
 
       if (clientData) {
-        const clientParsed = JSON.parse(clientData);
-        console.log('clientParsed:', clientParsed); // Log do objeto clientParsed
-
-        setClient(clientParsed);
-
-        // Buscar veículos do usuário
         try {
-          const response = await axios.get(
-            `http://localhost:8080/api/carros/cliente/${clientParsed.idCliente}`
-          );
-          if (response.status === 200) {
-            setModeloVeiculo(response.data); // Supondo que response.data seja um array de Carro
-          } else {
-            console.error('Erro ao obter veículos do cliente.');
+          const clientParsed: Cliente = JSON.parse(clientData);
+          console.log('clientParsed:', clientParsed); // Log do objeto clientParsed
+
+          setClient(clientParsed);
+
+          // Buscar veículos do usuário
+          try {
+            const response = await axios.get(
+              `http://localhost:8080/api/carros/cliente/${clientParsed.idCliente}`
+            );
+            if (response.status === 200) {
+              setModeloVeiculo(response.data); // Supondo que response.data seja um array de Carro
+            } else {
+              console.error('Erro ao obter veículos do cliente.');
+            }
+          } catch (error) {
+            console.error('Erro ao obter veículos do cliente:', error);
           }
         } catch (error) {
-          console.error('Erro ao obter veículos do cliente:', error);
+          console.error('Erro ao parsear clientData:', error);
+          window.location.href = '/';
         }
       } else {
         window.location.href = '/';
