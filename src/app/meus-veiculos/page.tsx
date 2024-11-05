@@ -1,16 +1,13 @@
-// app/meus-veiculos/page.tsx
-
 "use client";
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { Carro, Cliente } from '@/types/types'; 
+import { Carro } from '@/types/types'; 
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'; 
 
 export default function MeusVeiculos() {
   const [carros, setCarros] = useState<Carro[]>([]);
-  const [client, setClient] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,22 +15,28 @@ export default function MeusVeiculos() {
       try {
         const clientData = localStorage.getItem('clientData');
         if (clientData) {
-          const clientParsed: Cliente = JSON.parse(clientData);
-          setClient(clientParsed);
+          const clientParsed = JSON.parse(clientData);
+          console.log('ID do Cliente:', clientParsed.idCliente);
 
-          const response = await axios.get(
-            `http://localhost:8080/api/carros/cliente/${clientParsed.idCliente}`
+          // Utilize variáveis de ambiente para a URL da API
+          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+
+          const response = await axios.get<Carro[]>(
+            `${API_BASE_URL}/api/carros/cliente/${clientParsed.idCliente}`
           );
+
           if (response.status === 200) {
             setCarros(response.data); 
           } else {
             console.error('Erro ao obter veículos do cliente.');
           }
         } else {
+          // Redireciona para a página inicial se não houver dados do cliente
           window.location.href = '/';
         }
       } catch (error) {
         console.error('Erro na requisição:', error);
+        // Opcional: Definir um estado de erro para exibir uma mensagem para o usuário
       } finally {
         setLoading(false);
       }
@@ -45,7 +48,8 @@ export default function MeusVeiculos() {
     const confirmDelete = confirm('Tem certeza que deseja excluir este veículo?');
     if (confirmDelete) {
       try {
-        const response = await axios.delete(`http://localhost:8080/api/carros/${idCarro}`);
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+        const response = await axios.delete(`${API_BASE_URL}/api/carros/${idCarro}`);
         if (response.status === 204) {
           setCarros(carros.filter((carro) => carro.idCarro !== idCarro));
         } else {
@@ -120,7 +124,10 @@ export default function MeusVeiculos() {
 
       <main>
         {loading ? (
-          <p>Carregando...</p>
+          <div className="flex justify-center items-center">
+            {/* Você pode substituir por um spinner ou indicador de carregamento mais sofisticado */}
+            <p>Carregando...</p>
+          </div>
         ) : (
           <>
             {carros.length > 0 ? (
