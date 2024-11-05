@@ -5,12 +5,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { Carro } from '@/types/types'; 
+import { Carro, Cliente } from '@/types/types'; 
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'; 
 
 export default function MeusVeiculos() {
   const [carros, setCarros] = useState<Carro[]>([]);
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,11 +18,11 @@ export default function MeusVeiculos() {
       try {
         const clientData = localStorage.getItem('clientData');
         if (clientData) {
-          const client = JSON.parse(clientData);
-          setClient(client);
+          const clientParsed: Cliente = JSON.parse(clientData);
+          setClient(clientParsed);
 
           const response = await axios.get(
-            `http://localhost:8080/api/carros/cliente/${client.idCliente}`
+            `http://localhost:8080/api/carros/cliente/${clientParsed.idCliente}`
           );
           if (response.status === 200) {
             setCarros(response.data); 
@@ -58,7 +58,6 @@ export default function MeusVeiculos() {
     }
   };
 
-  // Função atualizada para incluir marca, cor e ano na query
   const getCarImage = async (marca: string, modelo: string, cor: string, ano: string): Promise<string> => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
@@ -75,12 +74,10 @@ export default function MeusVeiculos() {
       if (data.items && data.items.length > 0) {
         return data.items[0].link; 
       } else {
-        
         return '/path/to/placeholder.jpg';
       }
     } catch (error) {
       console.error('Erro ao buscar imagem:', error);
-      
       return '/path/to/placeholder.jpg';
     }
   };
@@ -95,7 +92,6 @@ export default function MeusVeiculos() {
         carro.anoFabricacao
       );
 
-      
       const novosCarros = [...carros];
       novosCarros[index] = { ...carro, imageUrl };
       setCarros(novosCarros);
@@ -118,7 +114,6 @@ export default function MeusVeiculos() {
               alt="Perfil"
               className="w-10 h-10 rounded-full cursor-pointer border border-white"
             />
-            
           </div>
         </div>
       </header>

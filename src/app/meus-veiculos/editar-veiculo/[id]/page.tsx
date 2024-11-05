@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Carro } from '@/types/types';
+import { Carro, Cliente } from '@/types/types';
 import Link from 'next/link';
 
 interface EditarVeiculoProps {
@@ -21,15 +21,22 @@ export default function EditarVeiculo({ params }: EditarVeiculoProps) {
   const [placa, setPlaca] = useState('');
   const [anoFabricacao, setAnoFabricacao] = useState('');
   const [cor, setCor] = useState('');
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       const clientData = localStorage.getItem('clientData');
       if (clientData) {
-        const client = JSON.parse(clientData);
-        setClient(client);
+        try {
+          const clientParsed: Cliente = JSON.parse(clientData);
+          setClient(clientParsed);
+        } catch (error) {
+          console.error('Erro ao parsear clientData:', error);
+          alert('Dados do cliente inválidos.');
+          window.location.href = '/';
+          return;
+        }
       } else {
         alert('Usuário não autenticado.');
         window.location.href = '/';

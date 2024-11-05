@@ -4,12 +4,12 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Orcamento } from '@/types/types'; 
+import { Orcamento, Cliente } from '@/types/types'; 
 import Link from 'next/link';
 
 export default function Pedidos() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([]);
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,14 +17,13 @@ export default function Pedidos() {
       try {
         const clientData = localStorage.getItem('clientData');
         if (clientData) {
-          const client = JSON.parse(clientData);
-          setClient(client);
+          const clientParsed: Cliente = JSON.parse(clientData);
+          setClient(clientParsed);
 
-          console.log('ID do Cliente:', client.idCliente);
+          console.log('ID do Cliente:', clientParsed.idCliente);
 
-        
           const response = await axios.get(
-            `http://localhost:8080/api/orcamentos/cliente/${client.idCliente}`
+            `http://localhost:8080/api/orcamentos/cliente/${clientParsed.idCliente}`
           );
 
           if (response.status === 200) {
@@ -54,14 +53,14 @@ export default function Pedidos() {
             Início
           </Link>
           <div className="relative">
-            
+            {/* Ícone de usuário */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="imagem-perfil cursor-pointer"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              onClick={() => {  }}
+              onClick={() => { /* Implementar ação se necessário */ }}
             >
               <path
                 strokeLinecap="round"
@@ -70,7 +69,6 @@ export default function Pedidos() {
                 d="M5.121 17.804A13.937 13.937 0 0112 15c2.757 0 5.293.696 7.379 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-          
           </div>
         </div>
       </header>
@@ -119,7 +117,6 @@ export default function Pedidos() {
             ) : (
               <div className="text-center">
                 <p className="text-xl mb-4">Você não possui nenhum pedido.</p>
-            
               </div>
             )}
           </>
@@ -128,7 +125,6 @@ export default function Pedidos() {
     </div>
   );
 }
-
 
 function getStatusText(status: number): string {
   switch (status) {

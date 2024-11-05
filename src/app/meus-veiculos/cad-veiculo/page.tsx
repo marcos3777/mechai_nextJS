@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Carro } from '@/types/types'; 
+import { Carro, Cliente } from '@/types/types'; 
 import Link from 'next/link';
 
 export default function CadastroVeiculo() {
@@ -13,12 +13,19 @@ export default function CadastroVeiculo() {
   const [placa, setPlaca] = useState('');
   const [anoFabricacao, setAnoFabricacao] = useState('');
   const [cor, setCor] = useState('');
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<Cliente | null>(null);
 
   useEffect(() => {
     const clientData = localStorage.getItem('clientData');
     if (clientData) {
-      setClient(JSON.parse(clientData));
+      try {
+        const clientParsed: Cliente = JSON.parse(clientData);
+        setClient(clientParsed);
+      } catch (error) {
+        console.error('Erro ao parsear clientData:', error);
+        alert('Dados do cliente inválidos.');
+        window.location.href = '/';
+      }
     } else {
       alert('Usuário não autenticado.');
       window.location.href = '/';
@@ -49,7 +56,6 @@ export default function CadastroVeiculo() {
       const response = await axios.post('http://localhost:8080/api/carros', novoCarro);
       if (response.status === 201) {
         alert('Veículo cadastrado com sucesso!');
-      
         window.location.href = '/meus-veiculos';
       } else {
         alert('Erro ao cadastrar veículo.');
@@ -74,7 +80,6 @@ export default function CadastroVeiculo() {
               alt="Perfil"
               className="w-10 h-10 rounded-full cursor-pointer border border-white"
             />
-      
           </div>
         </div>
       </header>
