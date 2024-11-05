@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Carro } from '../../../types/types'; // Ajuste o caminho conforme necessário
+import { Carro } from '@/types/types'; 
 import Link from 'next/link';
 
 export default function CadastroVeiculo() {
@@ -49,7 +49,7 @@ export default function CadastroVeiculo() {
       const response = await axios.post('http://localhost:8080/api/carros', novoCarro);
       if (response.status === 201) {
         alert('Veículo cadastrado com sucesso!');
-        // Redirecionar para "Meus Veículos" usando window.location.href
+      
         window.location.href = '/meus-veiculos';
       } else {
         alert('Erro ao cadastrar veículo.');
@@ -74,7 +74,7 @@ export default function CadastroVeiculo() {
               alt="Perfil"
               className="w-10 h-10 rounded-full cursor-pointer border border-white"
             />
-            {/* Adicione aqui o menu do perfil se necessário */}
+      
           </div>
         </div>
       </header>

@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
-import { Orcamento, OrcamentoComDetalhes, Mecanico, Cliente, Carro } from '../../types/types'; // Ajuste o caminho conforme necessário
+import { Orcamento, OrcamentoComDetalhes, Mecanico, Cliente, Carro } from '@/types/types';
 import { FaUserCircle } from 'react-icons/fa'; // Ícone de usuário
 
 export default function InicioMeca() {
@@ -20,7 +20,7 @@ export default function InicioMeca() {
   const [mecanico, setMecanico] = useState<Mecanico | null>(null);
 
   useEffect(() => {
-    // Obter dados do mecânico logado
+    
     const mecanicoData = localStorage.getItem('mecanicoData');
     console.log('mecanicoData do localStorage:', mecanicoData);
 
@@ -49,10 +49,10 @@ export default function InicioMeca() {
           const allOrcamentos = response.data as Orcamento[];
           console.log('Total de orçamentos recebidos:', allOrcamentos.length);
 
-          // Obter informações adicionais de cliente e carro
+          
           const orcamentosComDetalhes: OrcamentoComDetalhes[] = await Promise.all(
             allOrcamentos.map(async (orcamento) => {
-              // Obter nome do cliente
+              
               let clienteNome = 'Cliente Desconhecido';
               try {
                 const clienteResponse = await axios.get(`http://localhost:8080/api/clients/${orcamento.idCliente}`);
@@ -158,14 +158,14 @@ export default function InicioMeca() {
 
       if (response.status === 200) {
         alert('Orçamento atualizado com sucesso!');
-        // Atualizar a lista de orçamentos
+        
         setOrcamentosStatus1(
           orcamentosStatus1.filter(
             (o) => o.idOrcamento !== selectedOrcamento.idOrcamento
           )
         );
-        setOrcamentosStatus2([...orcamentosStatus2, response.data]); // Use response.data para garantir que os dados estão atualizados
-        // Limpar os estados
+        setOrcamentosStatus2([...orcamentosStatus2, response.data]); 
+        
         setSelectedOrcamento(null);
         setValor('');
         setDataPrevista('');
@@ -196,7 +196,7 @@ export default function InicioMeca() {
 
       if (response.status === 200) {
         alert('Orçamento finalizado com sucesso!');
-        // Remover o orçamento da lista
+        
         setOrcamentosStatus2(
           orcamentosStatus2.filter((o) => o.idOrcamento !== orcamento.idOrcamento)
         );

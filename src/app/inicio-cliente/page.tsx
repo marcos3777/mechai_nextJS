@@ -9,7 +9,7 @@ import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import L from 'leaflet';
 import { useMapEvent } from 'react-leaflet';
-import { Carro } from '../../types/types'; // Ajuste o caminho conforme necessário
+import { Carro } from '@/types/types'; 
 
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),

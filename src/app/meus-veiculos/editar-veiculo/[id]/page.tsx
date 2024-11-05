@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Carro } from '../../../../types/types';
+import { Carro } from '@/types/types';
 import Link from 'next/link';
 
 interface EditarVeiculoProps {

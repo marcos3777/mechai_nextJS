@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Orcamento } from '../../../types/types'; // Ajuste o caminho conforme necessário
+import { Orcamento } from '@/types/types'; 
 import Link from 'next/link';
 
 export default function Pedidos() {
@@ -22,7 +22,7 @@ export default function Pedidos() {
 
           console.log('ID do Cliente:', client.idCliente);
 
-          // Faça a requisição para obter os orçamentos do cliente
+        
           const response = await axios.get(
             `http://localhost:8080/api/orcamentos/cliente/${client.idCliente}`
           );
@@ -54,14 +54,14 @@ export default function Pedidos() {
             Início
           </Link>
           <div className="relative">
-            {/* Substituindo a imagem por um ícone de usuário padrão */}
+            
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="imagem-perfil cursor-pointer"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              onClick={() => { /* Adicione a lógica do menu se necessário */ }}
+              onClick={() => {  }}
             >
               <path
                 strokeLinecap="round"
@@ -70,7 +70,7 @@ export default function Pedidos() {
                 d="M5.121 17.804A13.937 13.937 0 0112 15c2.757 0 5.293.696 7.379 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            {/* Adicione aqui o menu do perfil se necessário */}
+          
           </div>
         </div>
       </header>
@@ -119,7 +119,7 @@ export default function Pedidos() {
             ) : (
               <div className="text-center">
                 <p className="text-xl mb-4">Você não possui nenhum pedido.</p>
-                {/* Você pode adicionar um botão para criar um novo pedido, se aplicável */}
+            
               </div>
             )}
           </>
@@ -129,7 +129,7 @@ export default function Pedidos() {
   );
 }
 
-// Função para converter o status em texto legível
+
 function getStatusText(status: number): string {
   switch (status) {
     case 0:

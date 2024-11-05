@@ -5,8 +5,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { Carro } from '../../types/types'; // Ajuste o caminho conforme necessário
-import { FaEdit, FaTrashAlt } from 'react-icons/fa'; // Ícones de edição e exclusão
+import { Carro } from '@/types/types'; 
+import { FaEdit, FaTrashAlt } from 'react-icons/fa'; 
 
 export default function MeusVeiculos() {
   const [carros, setCarros] = useState<Carro[]>([]);
@@ -25,7 +25,7 @@ export default function MeusVeiculos() {
             `http://localhost:8080/api/carros/cliente/${client.idCliente}`
           );
           if (response.status === 200) {
-            setCarros(response.data); // Não buscamos as imagens aqui
+            setCarros(response.data); 
           } else {
             console.error('Erro ao obter veículos do cliente.');
           }
@@ -73,14 +73,14 @@ export default function MeusVeiculos() {
       const data = await response.json();
 
       if (data.items && data.items.length > 0) {
-        return data.items[0].link; // URL da primeira imagem
+        return data.items[0].link; 
       } else {
-        // Retorna uma imagem placeholder se nenhuma imagem for encontrada
+        
         return '/path/to/placeholder.jpg';
       }
     } catch (error) {
       console.error('Erro ao buscar imagem:', error);
-      // Retorna uma imagem placeholder em caso de erro
+      
       return '/path/to/placeholder.jpg';
     }
   };
@@ -95,7 +95,7 @@ export default function MeusVeiculos() {
         carro.anoFabricacao
       );
 
-      // Atualiza o estado do carro com a nova imagem
+      
       const novosCarros = [...carros];
       novosCarros[index] = { ...carro, imageUrl };
       setCarros(novosCarros);
@@ -118,7 +118,7 @@ export default function MeusVeiculos() {
               alt="Perfil"
               className="w-10 h-10 rounded-full cursor-pointer border border-white"
             />
-            {/* Adicione aqui o menu do perfil se necessário */}
+            
           </div>
         </div>
       </header>
