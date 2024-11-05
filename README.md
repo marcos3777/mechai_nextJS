@@ -7,7 +7,7 @@
 
 ## Links
 - [Vídeo no YouTube](https://youtu.be/8hlv0Os2xzE)
-- [Deploy na Vercel](https://vercel.com/seu-link-aqui)
+- [Deploy na Vercel](https://mechai-next-js-lbxs-bpjh9imqe-marcos-projects-901f8433.vercel.app)
 
 ## Descrição
 Uma breve descrição do projeto, suas funcionalidades e objetivos. Explique o problema que seu projeto resolve e como ele beneficia os usuários.
