@@ -42,3 +42,22 @@ export type Cliente = {
     status: number;
     imageUrl?: string;
   };
+
+  export interface Orcamento {
+    idOrcamento: number;
+    idCliente: number; 
+    idMecanico?: number | null;
+    idCarro: number;
+    valor: string;
+    dtPrevistaFinalizacao: string;
+    dtFinalizacao: string;
+    tipoProblema: string;
+    descricaoProblema: string;
+    enderecoAtual: string;
+    status: number;
+  }
+
+  export interface OrcamentoComDetalhes extends Orcamento {
+    clienteNome: string;
+    carroModelo: string;
+  }

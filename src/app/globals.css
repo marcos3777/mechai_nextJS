@@ -1,3 +1,5 @@
+/* global.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -28,27 +30,143 @@
         @apply max-w-20 hover:max-w-24 hover:transition-transform duration-300 ease-in-out;
     }
 
-    /*Pagina Home */
-    .conteiner-home{
-        @apply flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-950 to-red-800 backdrop-blur-lg;
-        color: #ffffff; 
-    }
+
     
-    .container-botao{
-        @apply flex flex-col items-center w-full p-4 bg-transparent;
-        @apply md:flex-row md:justify-between;
 
-        & .butao{
-            @apply p-2 border rounded bg-black text-white hover:bg-gray-950;
-            @apply w-64;
-            @apply mx-2 my-2;
+    .conteiner-welcome{
+        @apply flex flex-col items-center mt-16 text-center px-4;
+        
+        & .welcome-text {
+            @apply text-5xl mb-4 text-white font-thin;
         }
 
-        & .butao-cad{
-            @apply p-2 border-l-2 border-black border-opacity-5 rounded bg-black text-white hover:bg-gray-950 hover:border-red-600 hover:border-l-2;
-            @apply w-64;
-            @apply mx-2 my-2;
+        & .item-p1{
+            @apply text-lg text-white font-light mb-8;
         }
+
+        & .item-p2{
+            @apply text-white font-light;
+        } 
+    }
+
+    /* Conteudo da main */
+    .container-principal{
+        @apply flex flex-col md:flex-row w-full justify-around p-8;
+
+        & .conteudo-semestr{
+            @apply bg-white/30 backdrop-blur-md p-4 pt-5 rounded shadow-md w-full md:w-5/12;
+        }
+
+        & .conteudo-semestr h2{
+            @apply text-center font-bold text-3xl text-white;
+        }
+
+        &  .caixa-semestr {
+            @apply border rounded border-white p-4 m-2 relative bg-black text-white;
+        }
+
+        & .titulo-item-semestr{
+            @apply text-lg font-bold text-red-600;
+        }
+
+        &  .caixa-semestr p {
+            @apply text-white gap-2 pt-2;
+        }
+
+        & .caixa-semestr h4{
+            @apply text-lg font-bold text-white text-end;
+        }
+
+        & .edit{  
+            @apply absolute top-2 right-8 text-lg hover:scale-125 transition-transform duration-300 ease-in-out cursor-pointer text-white;
+        }
+
+        & .delete{
+            @apply absolute top-2 right-2 text-lg hover:scale-125 transition-transform duration-300 ease-in-out cursor-pointer text-white;
+        }
+    }
+
+
+
+    
+.not-found-page {
+    @apply flex flex-col items-center justify-center
+     min-h-screen bg-gradient-to-b from-gray-950 to-red-800
+    text-white text-center p-8;
+& h1 {
+    @apply text-6xl font-bold mb-4;
+}       
+& h2 {
+     @apply text-3xl font-light mb-6;
+ } & p{
+    @apply text-lg font-light;
+}
+
+}
+
+/* Novas classes em português */
+
+.pagina-login {
+    @apply flex h-screen items-center justify-center bg-gray-100;
+}
+
+.input-login {
+    @apply w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.input-senha {
+    @apply w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.botao-cliente {
+    @apply w-full py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors;
+}
+
+.botao-mecanico {
+    @apply w-full py-3 bg-green-500 text-white rounded hover:bg-green-600 transition-colors;
+}
+
+.link-cadastrar-cliente {
+    @apply bg-blue-400 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition-colors;
+}
+
+.link-cadastrar-mecanico {
+    @apply bg-blue-400 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition-colors;
+}
+
+}
+/* global.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components{
+
+    /* Classes existentes */
+
+    .rodape {
+        @apply bg-black text-white text-center w-full p-5 backdrop-blur-lg justify-center;
+    }
+
+    .content-wrap{
+        @apply pb-32;
+    }
+
+    .cabecalho{
+        @apply flex pl-16 justify-between items-center h-20 text-2xl bg-black;
+
+        & li{
+            @apply mr-20 inline;
+
+            & a{
+                @apply text-white hover:underline hover:text-yellow-400;
+            }
+        }
+    }
+
+    .imgfiap{
+        @apply max-w-20 hover:max-w-24 hover:transition-transform duration-300 ease-in-out;
     }
 
     .conteiner-welcome{
@@ -104,173 +222,125 @@
         }
     }
 
-    /* Header */
-    .header {
-        @apply flex items-start w-full p-4;
-
-        & .image-container {
-            @apply w-24 h-24 flex-shrink-0;
-        }
-
-        & .participant-image {
-            @apply w-full h-full object-cover rounded-full;
-        }
-
-        & .participant-placeholder {
-            @apply w-24 h-24 flex items-center justify-center bg-gray-700 text-white rounded-full;
-        }
-
-        & .labels {
-            @apply flex flex-col ml-4 mt-2; 
-        }
-
-        & h2 {
-            @apply text-2xl font-bold text-white;
-        }
-
-        & p {
-            @apply text-lg text-white mt-2; 
-        }
-
-        & .button-group {
-            @apply flex gap-2 ml-auto; 
-        }
-
-        & .butao-cad {
-            @apply p-2 border-l-2 border-black border-opacity-5 rounded bg-black text-white hover:bg-gray-950 hover:border-red-600 hover:border-l-2;
-        }
+    .not-found-page {
+        @apply flex flex-col items-center justify-center
+         min-h-screen bg-gradient-to-b from-gray-950 to-red-800
+        text-white text-center p-8;
+    & h1 {
+        @apply text-6xl font-bold mb-4;
+    }       
+    & h2 {
+         @apply text-3xl font-light mb-6;
+     } & p{
+        @apply text-lg font-light;
     }
 
-    /* Custom Dropdown*/
-    .labels .custom-dropdown {
-        @apply relative inline-block text-left mt-2;
     }
 
-    .labels .custom-dropdown p {
-        @apply cursor-pointer border-b border-dotted border-gray-500 inline-block text-white;
+   
+
+    .pagina-inicio-cliente {
+        @apply min-h-screen bg-gray-50 p-6;
     }
 
-    .labels .custom-dropdown-options {
-        @apply absolute z-10 mt-2 w-56 bg-gray-800 shadow-md rounded-md; 
+    .cabecalho-inicio-cliente {
+        @apply flex items-center justify-between bg-black text-white p-6 rounded-lg mb-8 shadow-lg;
     }
 
-    .labels .custom-dropdown-option {
-        @apply px-4 py-2 hover:bg-gray-700 cursor-pointer text-white; 
-
-    
-    .text-white {
-        color: #ffffff;
+    .titulo-cabecalho {
+        @apply text-2xl font-bold;
     }
 
-    .text-gray-300 {
-        color: #d1d5db;
+    .menu-opcoes {
+        @apply flex items-center space-x-4;
     }
 
-    /* Participant Placeholder*/
-    .participant-placeholder p {
-        @apply text-center;
+    .imagem-perfil {
+        @apply w-10 h-10 rounded-full cursor-pointer border border-white;
     }
-    /* DROPDOWN */
 
-    .dropdownnomes {
-        @apply relative inline-block text-left mr-4;
-      }
-      
-      .opcoeshover {
-        @apply px-4 py-2 hover:bg-red-700 cursor-pointer;
-      }
-      
-      .opcoesnomes {
-        @apply cursor-pointer border-b border-dotted border-red-800 inline-block text-white;
-      }
-      
-      .coresposicoesopcoes {
-        @apply absolute z-10 mt-2 w-56 bg-black shadow-md rounded-md transition-opacity duration-300 ease-in-out;
-      }
-      /* DROPDOWN */
+    .menu-relativo {
+        @apply relative;
+    }
 
-      /* CADASTRO */
-      .cadastropage{
-        @apply flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-950 to-red-800 backdrop-blur-lg;
-      }
+    .menu-dropdown {
+        @apply absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg;
+    }
 
-      .divopcadastro{
-        @apply mb-4;
-        & label{
-            @apply block text-white}
-        & select{
-            @apply  w-full p-2 border border-black/70 rounded bg-black/70
-        }
-        & input{
-            @apply  w-full p-2 border border-black/70 rounded bg-black/70
-        }
-        & textarea{
-            @apply  w-full p-2 border border-black/70 rounded bg-black/70
-        }
-      }
+    .item-menu-dropdown {
+        @apply block px-4 py-2 text-gray-700 hover:bg-gray-200;
+    }
 
-      .conteiner-home {
-        & h1{
-            @apply text-white text-2xl font-bold mb-4 text-center;}
-        & form {
-            @apply p-4 rounded shadow-md w-1/2 bg-transparent
-        }
-      }
+    .layout-principal {
+        @apply grid grid-cols-1 lg:grid-cols-2 gap-8;
+    }
 
-      .botaocadcss{ 
-        @apply w-full p-2 bg-white text-black rounded hover:bg-gray-600 hover:text-white
-      }
+    .caixa-solicitacao {
+        @apply bg-white p-8 rounded-lg shadow-lg;
+    }
 
-      /* CADASTRO */
-      /* EDIT */
-      .container-edit {
-        @apply flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-950 to-red-800;
-      }
-      .form-edit {
-        @apply p-4 rounded shadow-md w-1/2 bg-transparent;
-      
-        & h1 {
-          @apply text-center text-2xl font-bold my-4 text-white;
-        }
-      }
-      .div-opcoes-form-edit {
-        @apply mb-4;
-      
-        & label {
-          @apply text-white block mb-2  ;
-        }
-      }
-      .entradas-form {
-        @apply p-2 border rounded w-full text-white bg-black bg-opacity-50;
-      
-      
-        & option {
-         @apply text-white font-bold bg-black;
-        }
-      }
-      .botao-submit{
-        @apply p-2 bg-black text-white rounded;
-      }
-      .botao-cancelar{
-        @apply p-2 bg-red-500 text-white rounded ml-2;
-      }
+    .titulo-solicitacao {
+        @apply text-2xl font-semibold mb-6 text-gray-800;
+    }
 
-      /* EDIT */
+    .espacamento-mb-6 {
+        @apply mb-6;
+    }
 
-}
-.not-found-page {
-    @apply flex flex-col items-center justify-center
-     min-h-screen bg-gradient-to-b from-gray-950 to-red-800
-    text-white text-center p-8;
-& h1 {
-    @apply text-6xl font-bold mb-4;
-}       
-& h2 {
-     @apply text-3xl font-light mb-6;
- } & p{
-    @apply text-lg font-light;
-}
+    .label-campo {
+        @apply block text-gray-600 font-semibold mb-2;
+    }
 
-}
+    .campo-nome {
+        @apply bg-gray-100 p-3 rounded-lg border;
+    }
+
+    .campo-select-veiculo {
+        @apply w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    }
+
+    .link-cadastrar-veiculo {
+        @apply text-blue-600;
+    }
+
+    .campo-select-problema {
+        @apply w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    }
+
+    .campo-textarea-descricao {
+        @apply w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    }
+
+    .botao-enviar-solicitacao {
+        @apply w-full py-3 text-white font-semibold rounded-lg transition-colors;
+    }
+
+    .botao-enviar-ativo {
+        @apply bg-blue-600 hover:bg-blue-700;
+    }
+
+    .botao-enviar-desativado {
+        @apply bg-gray-400 cursor-not-allowed;
+    }
+
+    .caixa-endereco-atual {
+        @apply bg-white p-8 rounded-lg shadow-lg;
+    }
+
+    .titulo-endereco {
+        @apply text-2xl font-semibold mb-6 text-gray-800;
+    }
+
+    .campo-input-endereco {
+        @apply w-full p-3 mb-6 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    }
+
+    .container-mapa {
+        @apply h-80 rounded-lg overflow-hidden;
+    }
+
+    .mapa-container {
+        @apply w-full h-full;
+    }
 
 }

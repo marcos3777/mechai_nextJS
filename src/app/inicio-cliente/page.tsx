@@ -9,14 +9,23 @@ import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import L from 'leaflet';
 import { useMapEvent } from 'react-leaflet';
+import { Carro } from '../../types/types'; // Ajuste o caminho conforme necessário
 
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+const TileLayer = dynamic(() => import('react-leaflet').then((mod) => mod.TileLayer), {
+  ssr: false,
+});
+const Marker = dynamic(() => import('react-leaflet').then((mod) => mod.Marker), {
+  ssr: false,
+});
 
 export default function InicioCliente() {
   const [client, setClient] = useState<any>(null);
-  const [modeloVeiculo, setModeloVeiculo] = useState<string[]>([]);
+  const [modeloVeiculo, setModeloVeiculo] = useState<Carro[]>([]);
+  const [selectedVeiculoId, setSelectedVeiculoId] = useState<number | null>(null);
   const [problema, setProblema] = useState('');
   const [descricao, setDescricao] = useState('');
   const [position, setPosition] = useState<L.LatLng | null>(null);
@@ -27,22 +36,40 @@ export default function InicioCliente() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const problemasComuns = [
-    "Falha na bateria",
-    "Problema no motor",
-    "Freios desgastados",
-    "Pneus furados",
-    "Problema elétrico"
+    'Falha na bateria',
+    'Problema no motor',
+    'Freios desgastados',
+    'Pneus furados',
+    'Problema elétrico',
   ];
 
   useEffect(() => {
     const fetchData = async () => {
       const clientData = localStorage.getItem('clientData');
+      console.log('clientData:', clientData); // Log do clientData obtido do localStorage
+
       if (clientData) {
-        setClient(JSON.parse(clientData));
+        const clientParsed = JSON.parse(clientData);
+        console.log('clientParsed:', clientParsed); // Log do objeto clientParsed
+
+        setClient(clientParsed);
+
+        // Buscar veículos do usuário
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/api/carros/cliente/${clientParsed.idCliente}`
+          );
+          if (response.status === 200) {
+            setModeloVeiculo(response.data); // Supondo que response.data seja um array de Carro
+          } else {
+            console.error('Erro ao obter veículos do cliente.');
+          }
+        } catch (error) {
+          console.error('Erro ao obter veículos do cliente:', error);
+        }
       } else {
         window.location.href = '/';
       }
-      setModeloVeiculo(["Modelo A", "Modelo B", "Modelo C"]);
     };
     fetchData();
   }, []);
@@ -63,24 +90,30 @@ export default function InicioCliente() {
 
   const reverseGeocode = async (lat: number, lon: number) => {
     try {
-      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+      );
       setEndereco(response.data.display_name);
     } catch (error) {
-      console.error("Erro ao obter endereço:", error);
+      console.error('Erro ao obter endereço:', error);
     }
   };
 
   const geocodeAddress = async () => {
     try {
-      const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${endereco}`);
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          endereco
+        )}`
+      );
       if (response.data.length > 0) {
         const { lat, lon } = response.data[0];
         setPosition(new L.LatLng(parseFloat(lat), parseFloat(lon)));
       } else {
-        alert("Endereço não encontrado");
+        alert('Endereço não encontrado');
       }
     } catch (error) {
-      console.error("Erro ao converter endereço em coordenadas:", error);
+      console.error('Erro ao converter endereço em coordenadas:', error);
     }
   };
 
@@ -93,15 +126,43 @@ export default function InicioCliente() {
   };
 
   const handleSubmit = async () => {
+    if (!selectedVeiculoId) {
+      alert('Por favor, selecione um veículo.');
+      return;
+    }
+    if (!tipoProblema) {
+      alert('Por favor, selecione o tipo de problema.');
+      return;
+    }
+    if (!descricao) {
+      alert('Por favor, insira a descrição do problema.');
+      return;
+    }
+    if (!endereco) {
+      alert('Por favor, insira o endereço atual.');
+      return;
+    }
+
+    console.log('client:', client); // Log do objeto client
+    console.log('client.idCliente:', client?.idCliente); // Log do idCliente
+
+    // Verificação adicional
+    if (!client || !client.idCliente) {
+      alert('Erro: Cliente não identificado. Por favor, faça login novamente.');
+      return;
+    }
+
     try {
       const requestData = {
         idCliente: client.idCliente,
-        idCarro: 1,
+        idCarro: selectedVeiculoId,
         tipoProblema: tipoProblema,
         descricaoProblema: descricao,
         enderecoAtual: endereco,
         status: 1,
       };
+
+      console.log('requestData:', requestData); // Log dos dados da requisição
 
       const response = await fetch('http://localhost:8080/api/orcamentos', {
         method: 'POST',
@@ -115,7 +176,11 @@ export default function InicioCliente() {
         alert('Solicitação enviada com sucesso!');
       } else {
         const errorData = await response.json();
-        alert(`Erro ao enviar solicitação: ${errorData.message || 'Tente novamente mais tarde.'}`);
+        alert(
+          `Erro ao enviar solicitação: ${
+            errorData.message || 'Tente novamente mais tarde.'
+          }`
+        );
       }
     } catch (error) {
       console.error('Erro ao enviar solicitação:', error);
@@ -124,66 +189,99 @@ export default function InicioCliente() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <header className="flex items-center justify-between bg-black text-white p-6 rounded-lg mb-8 shadow-lg">
-        <h1 className="text-2xl font-bold">Minhas Solicitações</h1>
-        <div className="flex items-center space-x-4">
-          <Link href="#" className="text-lg">Minhas Solicitações</Link>
-          <div className="relative" ref={menuRef}>
-            <img
-              src="/path/to/profile.jpg"
-              alt="Perfil"
-              className="w-10 h-10 rounded-full cursor-pointer border border-white"
+    <div className="pagina-inicio-cliente">
+      <header className="cabecalho-inicio-cliente">
+        <h1 className="titulo-cabecalho">Minhas Solicitações</h1>
+        <div className="menu-opcoes">
+          <Link href="/inicio-cliente/pedidos" className="link-solicitacoes">
+            Minhas Solicitações
+          </Link>
+          <div className="menu-relativo" ref={menuRef}>
+            {/* Substituindo a imagem por um ícone de usuário padrão */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="imagem-perfil cursor-pointer"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-            />
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5.121 17.804A13.937 13.937 0 0112 15c2.757 0 5.293.696 7.379 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
             {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg">
-                <Link href="/meus-veiculos" className="block px-4 py-2 text-gray-700 hover:bg-gray-200">Meus veículos</Link>
-                <Link href="/cadastrar-veiculo" className="block px-4 py-2 text-gray-700 hover:bg-gray-200">Cadastrar veículo</Link>
+              <div className="menu-dropdown">
+                <Link href="/meus-veiculos" className="item-menu-dropdown">
+                  Meus veículos
+                </Link>
+                <Link href="meus-veiculos/cad-veiculo" className="item-menu-dropdown">
+                  Cadastrar veículo
+                </Link>
               </div>
             )}
           </div>
         </div>
       </header>
 
-      <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800">Solicitar Assistência</h2>
+      <main className="layout-principal">
+        <div className="caixa-solicitacao">
+          <h2 className="titulo-solicitacao">Solicitar Assistência</h2>
 
-          <div className="mb-6">
-            <label className="block text-gray-600 font-semibold mb-2">Nome</label>
-            <p className="bg-gray-100 p-3 rounded-lg border">{client?.nome}</p>
+          <div className="espacamento-mb-6">
+            <label className="label-campo">Nome</label>
+            <p className="campo-nome">{client?.nome}</p>
           </div>
 
-          {/* Comentário: Precisamos criar o CRUD para obter os modelos de veículos do cliente */}
-          <div className="mb-6">
-            <label className="block text-gray-600 font-semibold mb-2">Modelo do Veículo</label>
-            <select className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">Selecione um modelo</option>
-              {modeloVeiculo.map((modelo, index) => (
-                <option key={index} value={modelo}>{modelo}</option>
-              ))}
-            </select>
+          <div className="espacamento-mb-6">
+            <label className="label-campo">Modelo do Veículo</label>
+            {modeloVeiculo.length > 0 ? (
+              <select
+                className="campo-select-veiculo"
+                value={selectedVeiculoId || ''}
+                onChange={(e) => setSelectedVeiculoId(Number(e.target.value))}
+              >
+                <option value="">Selecione um veículo</option>
+                {modeloVeiculo.map((veiculo) => (
+                  <option key={veiculo.idCarro} value={veiculo.idCarro}>
+                    {`${veiculo.marca} ${veiculo.modelo}`}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p>
+                Você não possui veículos cadastrados.{' '}
+                <Link href="meus-veiculos/cad-veiculo" className="link-cadastrar-veiculo">
+                  Cadastre um veículo
+                </Link>
+                .
+              </p>
+            )}
           </div>
 
-          <div className="mb-6">
-            <label className="block text-gray-600 font-semibold mb-2">Tipo de Problema</label>
+          <div className="espacamento-mb-6">
+            <label className="label-campo">Tipo de Problema</label>
             <select
-              className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="campo-select-problema"
               value={tipoProblema}
               onChange={(e) => setTipoProblema(e.target.value)}
             >
               <option value="">Selecione um problema</option>
               {problemasComuns.map((problema, index) => (
-                <option key={index} value={problema}>{problema}</option>
+                <option key={index} value={problema}>
+                  {problema}
+                </option>
               ))}
             </select>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-gray-600 font-semibold mb-2">Descrição do Problema</label>
+          <div className="espacamento-mb-6">
+            <label className="label-campo">Descrição do Problema</label>
             <textarea
-              className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="campo-textarea-descricao"
               rows={4}
               placeholder="Descreva o problema aqui..."
               value={descricao}
@@ -193,27 +291,36 @@ export default function InicioCliente() {
 
           <button
             onClick={handleSubmit}
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={!selectedVeiculoId || !tipoProblema || !descricao || !endereco}
+            className={`botao-enviar-solicitacao ${
+              !selectedVeiculoId || !tipoProblema || !descricao || !endereco
+                ? 'botao-enviar-desativado'
+                : 'botao-enviar-ativo'
+            }`}
           >
             Enviar Solicitação
           </button>
         </div>
 
-        <div className="bg-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800">Endereço Atual</h2>
+        <div className="caixa-endereco-atual">
+          <h2 className="titulo-endereco">Endereço Atual</h2>
           <input
             type="text"
             value={endereco}
             onChange={(e) => setEndereco(e.target.value)}
             onBlur={geocodeAddress}
             placeholder="Digite um endereço"
-            className="w-full p-3 mb-6 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="campo-input-endereco"
           />
-          <div className="h-80 rounded-lg overflow-hidden">
-            <MapContainer center={[-23.55052, -46.633308]} zoom={13} className="w-full h-full">
+          <div className="container-mapa">
+            <MapContainer
+              center={[-23.55052, -46.633308]}
+              zoom={13}
+              className="mapa-container"
+            >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; OpenStreetMap contributors'
+                attribution="&copy; OpenStreetMap contributors"
               />
               {position && <Marker position={position} />}
               <MapClickHandler />
